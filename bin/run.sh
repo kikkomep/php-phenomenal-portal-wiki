@@ -21,8 +21,10 @@ for dir in `ls ./`;
 do
     for file in `ls ./$dir`;
     do
-      filename="${file%.*}"
-      mkdir -p "$htmlFolder/$dir" && markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename"
-      markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename$extension"
+	    if [ ! -d "$file" ]; then
+			filename="${file%.*}"
+			mkdir -p "$htmlFolder/$dir" && markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename"
+			markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename$extension"
+	    fi
     done
 done
