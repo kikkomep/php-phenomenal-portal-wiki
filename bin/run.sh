@@ -21,7 +21,7 @@ for dir in `ls ./`;
 do
     for file in `ls ./$dir`;
     do
-	    if [[ -f "$file" ]]; then
+	    if [[ -f "$dir/$file" ]]; then
 	    	echo $file
 			filename="${file%.*}"
 			mkdir -p "$htmlFolder/$dir" && markdown2 --extras fenced-code-blocks "$dir/$file" > "$htmlFolder/$dir/$filename"
