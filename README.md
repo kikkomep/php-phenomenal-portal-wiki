@@ -1,5 +1,5 @@
 # Federated Git Wiki
-Version 0.4.0
+Version 0.4.1
 
 
 ## Installation
@@ -30,6 +30,9 @@ to the `git clone` command.
 * If crontab is used, the absolute location of markdown2 needs to be specified
 
 ## Changelog
+
+##### Updates v0.4.1
+Improve functions to get wiki data
 
 ##### Updates v0.4.0
 Integrate `markdown2html` as a conversion tool
