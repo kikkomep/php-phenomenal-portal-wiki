@@ -78,20 +78,14 @@ function getFilenamesList($dir) {
     return $data;
 }
 
-function parseMenuForSearch($dir){
-
+function parseMenuForSearch($dir)
+{
     $data = array();
-
     $html = file_get_html($dir);
-
-    foreach($html->find('li') as $row) {
-
-        if(!is_null($row->find('a', 0)->href)) {
-            $temp = array();
-            $temp['link'] = $row->find('a', 0)->href;
-            $temp['name'] = $row->plaintext;
-            $data[] = $temp;
-        }
+    foreach ($html->find('li') as $row) {
+        $link = extractLinkElement($row);
+        if ($link)
+            $data[] = extractLinkElement($row);
     }
     return $data;
 }
@@ -120,19 +114,13 @@ function parseMenuPage($dir, $format, $limit){
         $data = array();
 
         $html = file_get_html($dir);
-
-        foreach($html->find('li') as $row) {
-
-            if($limit > 0 || $limit == -1){
-                $temp = array();
-
-                $temp['link'] = $row->find('a', 0)->href;
-                $temp['name'] = $row->plaintext;
-
-                $data[] = $temp;
+        foreach ($html->find('li') as $row) {
+            if ($limit > 0 || $limit == -1) {
+                $link = extractLinkElement($row);
+                if ($link)
+                    $data[] = extractLinkElement($row);
                 $limit--;
             }
-
         }
         $result['data'] = $data;
     }
@@ -140,7 +128,18 @@ function parseMenuPage($dir, $format, $limit){
     echo json_encode($result);
 }
 
-function parsePageContent($folderName, $file_name, $format, $limit){
+function extractLinkElement($row)
+{
+    $result = null;
+    $href = $row->find('a', 0)->href;
+    if (!is_null($href)) {
+        $result = array();
+        $result['id'] = strpos($href, 'http') === 0 ? substr($href, strrpos($href, '/') + 1) : $href;
+        $result['link'] = $result['id'] . ".html";
+        $result['name'] = $row->plaintext;
+    }
+    return $result;
+}
 
     global $path;
 
