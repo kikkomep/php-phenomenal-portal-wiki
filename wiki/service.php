@@ -7,235 +7,176 @@ set_time_limit(60);
 
 $path = "../wiki-html";
 
-function getAllWiki(){
+function getAllWiki()
+{
     global $path;
-
-    $dir = $path;
-
-    getFilenames($dir, '');
+    getFilenames($path, '');
 }
 
-function searchPageContent($term){
+function searchPageContent($term)
+{
     $result = array();
-
-    if($term == '') {
+    if ($term == '') {
         $result['result'] = 0;
         $result['data'] = array();
     } else {
         global $path;
-        $dir = $path."/phenomenal-h2020.wiki/";
+        $dir = $path . "/phenomenal-h2020.wiki/";
         $result['result'] = 1;
-
-        $temp = array();
-        $temp = getFilenamesList($dir);
+        $temp = getFilenameList($dir);
         $searchResult = array();
-
-         foreach ($temp as $k=>$v){
-
-             if(stripos($v['name'], $term) !== false){
+        foreach ($temp as $k => $v) {
+            if (stripos($v['name'], $term) !== false) {
                 $searchResult[] = $v;
-             }
-         }
+            }
+        }
 
-         try {
+        try {
             $docsearch = new File_Search\Document_Search(
                 array(__DIR__ . '/../wiki-html/phenomenal-h2020.wiki/'),
                 $term
             );
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             echo $e->getMessage();
         }
 
-        if(isset($docsearch) && $docsearch != NULL) {
-//            var_dump($docsearch->getContainingFiles());
-            foreach ($docsearch->getContainingFiles() as $value){
-//                 echo pathinfo($value)['filename'];
-                 foreach ($temp as $k=>$v){
-                     if(strcmp($v['link'], pathinfo($value)['filename']) == 0){
+        if (isset($docsearch) && $docsearch != NULL) {
+            foreach ($docsearch->getContainingFiles() as $value) {
+                foreach ($temp as $k => $v) {
+                    if (strcmp($v['link'], pathinfo($value)['filename']) == 0) {
                         $searchResult[] = $v;
-                     }
-                 }
+                    }
+                }
             }
-
         }
-
-
-//        echo var_dump($searchResult);
         $searchResult = array_unique($searchResult, SORT_REGULAR);
-//        echo var_dump($searchResult);
-
         $result['data'] = array_values($searchResult);
     }
     echo json_encode($result);
 }
 
-function getFilenamesList($dir) {
-    $data = createEmptyJSONDataArray();
-    $data = parseMenuForSearch($dir.'Tutorials');
-
-    $data = array_merge(parseMenuForSearch($dir.'Tutorials'), parseMenuForSearch($dir.'User-Documentation'), parseMenuForSearch($dir.'Developer-Documentation'));
-
-    return $data;
+function getFilenameList($dir)
+{
+    return array_merge(
+        parseMenuForSearch($dir . 'Tutorials.html'),
+        parseMenuForSearch($dir . 'User-Documentation.html'),
+        parseMenuForSearch($dir . 'Developer-Documentation.html')
+    );
 }
 
-function parseMenuForSearch($dir){
-
+function parseMenuForSearch($dir)
+{
     $data = array();
-
     $html = file_get_html($dir);
-
-    foreach($html->find('li') as $row) {
-
-        if(!is_null($row->find('a', 0)->href)) {
-            $temp = array();
-            $temp['link'] = $row->find('a', 0)->href;
-            $temp['name'] = $row->plaintext;
-            $data[] = $temp;
-        }
+    foreach ($html->find('li') as $row) {
+        $link = extractLinkElement($row);
+        if ($link)
+            $data[] = extractLinkElement($row);
     }
     return $data;
 }
 
 
-function parseMenuPageContent($folderName, $file_name, $format, $limit){
-
+function parseMenuPageContent($folderName, $file_name, $format, $limit)
+{
     global $path;
-
-    $dir = $path."/".$folderName."/".$file_name;
+    $dir = $path . "/" . $folderName . "/" . $file_name;
     parseMenuPage($dir, $format, $limit);
 }
 
-function parseMenuPage($dir, $format, $limit){
-
+function parseMenuPage($dir, $format, $limit)
+{
     $result = array();
-
-    if( strpos($dir, '../') == true || $dir == '' ) {
+    if (strpos($dir, '../') == true || $dir == '') {
         $result['result'] = 0;
         $result['data'] = '{}';
-
     } else {
-
         $result['result'] = 1;
-
         $data = array();
-
         $html = file_get_html($dir);
-
-        foreach($html->find('li') as $row) {
-
-            if($limit > 0 || $limit == -1){
-                $temp = array();
-
-                $temp['link'] = $row->find('a', 0)->href;
-                $temp['name'] = $row->plaintext;
-
-                $data[] = $temp;
+        foreach ($html->find('li') as $row) {
+            if ($limit > 0 || $limit == -1) {
+                $link = extractLinkElement($row);
+                if ($link)
+                    $data[] = extractLinkElement($row);
                 $limit--;
             }
-
         }
         $result['data'] = $data;
     }
-
     echo json_encode($result);
 }
 
-function parsePageContent($folderName, $file_name, $format, $limit){
+function extractLinkElement($row)
+{
+    $result = null;
+    $href = $row->find('a', 0)->href;
+    if (!is_null($href)) {
+        $result = array();
+        $result['id'] = strpos($href, 'http') === 0 ? substr($href, strrpos($href, '/') + 1) : $href;
+        $result['link'] = $result['id'] . ".html";
+        $result['name'] = $row->plaintext;
+    }
+    return $result;
+}
 
+function parsePageContent($folderName, $file_name, $format, $limit)
+{
     global $path;
-
-    $dir = $path."/".$folderName."/".$file_name;
+    $dir = $path . "/" . $folderName . "/" . $file_name;
     parsePage($dir, $format, $limit);
 }
 
-function parsePage($dir, $format, $limit){
-
+function parsePage($dir, $format, $limit)
+{
     $result = array();
-
-    if( !file_exists($dir) || strpos($dir, '../') == true || $dir == '' ) {
+    if (!file_exists($dir) || strpos($dir, '../') == true || $dir == '') {
         $result['result'] = 0;
         $result['data'] = 'TBD';
-
     } else {
-
         $result['result'] = 1;
-
-        $data = array();
-
         $html = file_get_contents($dir);
-
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', "UTF-8");;
-
-//        $html = file_get_html($dir);
-//        foreach($html->find('li') as $row) {
-//
-//            if($limit > 0 || $limit == -1){
-//                $temp = array();
-//
-//                $temp['link'] = $row->find('a', 0)->href;
-//                $temp['name'] = $row->plaintext;
-//
-//                $data[] = $temp;
-//                $limit--;
-//            }
-//
-//        }
-     //   header('Content-Type: application/json');
- //       echo $html;
-       // $result['data'] = htmlentities($html, ENT_QUOTES | ENT_IGNORE, "UTF-8");
-
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', "UTF-8");
         $result['data'] = $html;
     }
-
     echo json_encode($result);
 }
 
 
-function getContentFromWiki($folderName, $format){
-
+function getContentFromWiki($folderName, $format)
+{
     global $path;
-
-    $dir = $path."/".$folderName;
-
+    $dir = $path . "/" . $folderName;
     getFilenames($dir, $format);
 }
 
-function getFilenames($dir, $format){
-
+function getFilenames($dir, $format)
+{
     $data = createEmptyJSONDataArray();
-
-    if($format !== 'array'){
-        if(is_dir($dir)){
-            $indir = array_filter(scandir($dir), function($item) {
+    if ($format !== 'array') {
+        if (is_dir($dir)) {
+            $indir = array_filter(scandir($dir), function ($item) {
                 return $item[0] !== '.';
             });
-
             $data['result'] = 1;
             $data['data'] = $indir;
         }
     } else {
-        if(is_dir($dir)){
-            $indir = array_filter(scandir($dir), function($item) {
+        if (is_dir($dir)) {
+            $indir = array_filter(scandir($dir), function ($item) {
                 return $item[0] !== '.';
             });
-
             $data['result'] = 1;
             $data['data'] = array_values($indir);
         }
-
     }
-
-
     print_r(json_encode($data));
 }
 
-function createEmptyJSONDataArray(){
+function createEmptyJSONDataArray()
+{
     $data = array();
-
     $data['result'] = 0;
-    $data['data'] = json_decode ("{}");
-
+    $data['data'] = json_decode("{}");
     return $data;
 }
-
-?>
