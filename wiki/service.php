@@ -69,13 +69,13 @@ function searchPageContent($term){
     echo json_encode($result);
 }
 
-function getFilenamesList($dir) {
-    $data = createEmptyJSONDataArray();
-    $data = parseMenuForSearch($dir.'Tutorials');
-
-    $data = array_merge(parseMenuForSearch($dir.'Tutorials'), parseMenuForSearch($dir.'User-Documentation'), parseMenuForSearch($dir.'Developer-Documentation'));
-
-    return $data;
+function getFilenameList($dir)
+{
+    return array_merge(
+        parseMenuForSearch($dir . 'Tutorials.html'),
+        parseMenuForSearch($dir . 'User-Documentation.html'),
+        parseMenuForSearch($dir . 'Developer-Documentation.html')
+    );
 }
 
 function parseMenuForSearch($dir)
