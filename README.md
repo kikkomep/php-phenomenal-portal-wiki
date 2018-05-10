@@ -1,5 +1,5 @@
 # Federated Git Wiki
-Version 0.4.1
+Version 1.1.0
 
 
 ## Installation
@@ -31,21 +31,19 @@ to the `git clone` command.
 
 ## Changelog
 
-##### Updates v0.4.1
-Improve functions to get wiki data
-
-##### Updates v0.4.0
-Integrate `markdown2html` as a conversion tool
+##### Updates v1.1.0
+* Improve functions to get wiki data
+* Integrate `markdown2html` as a conversion tool
 
 ##### Updates v0.3.1
-Improve bash
-Add full text search
+* Improve bash
+* Add full text search
 
 ##### Updates v0.2.2
-Add query string to redirect pages
+* Add query string to redirect pages
 
 ##### Updates v0.2.1
-Production version
+* Production version
 
 ##### Updates v0.2
-Data can be pulled across and displayed
+* Data can be pulled across and displayed
