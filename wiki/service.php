@@ -123,19 +123,19 @@ function extractLinkElement($row)
 function parsePageContent($folderName, $file_name, $format, $limit)
 {
     global $path;
-    $dir = $path . "/" . $folderName . "/" . $file_name;
-    parsePage($dir, $format, $limit);
+    $path = searchFile($path . "/" . $folderName . "/" . $file_name);
+    parsePage($path, $format, $limit);
 }
 
-function parsePage($dir, $format, $limit)
+function parsePage($path, $format, $limit)
 {
     $result = array();
-    if (!file_exists($dir) || strpos($dir, '../') == true || $dir == '') {
+    if (!$path || empty($path) || !file_exists($path)) {
         $result['result'] = 0;
         $result['data'] = 'TBD';
     } else {
         $result['result'] = 1;
-        $html = file_get_contents($dir);
+        $html = file_get_contents($path);
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', "UTF-8");
         $result['data'] = $html;
     }
@@ -179,4 +179,24 @@ function createEmptyJSONDataArray()
     $data['result'] = 0;
     $data['data'] = json_decode("{}");
     return $data;
+}
+
+/**
+ * Search a file in case insensitive mode
+ * @param $file fileName to search for
+ * @return bool|string returns the real filename (with the right case) if a matching exists;
+ *         <code>FALSE</code> if there exists no matching
+ */
+function searchFile($file)
+{
+    if (file_exists($file) === TRUE) {
+        return $file;
+    }
+    $fileLowerCase = strtolower($file);
+    foreach (glob(dirname($file).'/*') as $file) {
+        if (strtolower($file) === $fileLowerCase) {
+            return $file;
+        }
+    }
+    return FALSE;
 }
