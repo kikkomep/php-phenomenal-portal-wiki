@@ -1,7 +1,8 @@
-#Federated Git Wiki
-Version 0.3
+# Federated Git Wiki
+Version 1.1.0
 
-#Installation
+
+## Installation
 Make sure Python is install in the unix based system.
 
 Install markdown 2
@@ -16,23 +17,33 @@ Initialise by running the following under your hosting folder
 
     ./bin/run.sh
 
-Setting permission of `bin` `conf` to be 644, other folders can be set as 755
-
+Setting permission of `bin` `conf` to be 644, other folders can be set as 755 
 `path` in `bin` needs to be set.
 
-## Note
 
-If crontab is used, markdown2 needs to specify location
+## Notes
 
-##Updates v0.3.1
-Improve bash
-Add full text search
+* This repository uses a Git submodule. To easily initialize and update 
+the submodule pass the option `--recurse-submodules` 
+to the `git clone` command.
 
-##Updates v0.2.2
-Add query string to redirect pages
+* If crontab is used, the absolute location of markdown2 needs to be specified
 
-##Updates v0.2.1
-Production version
+## Changelog
 
-##Updates v0.2
-Data can be pulled across and displayed
+##### Updates v1.1.0
+* Improve functions to get wiki data
+* Integrate `markdown2html` as a conversion tool
+
+##### Updates v0.3.1
+* Improve bash
+* Add full text search
+
+##### Updates v0.2.2
+* Add query string to redirect pages
+
+##### Updates v0.2.1
+* Production version
+
+##### Updates v0.2
+* Data can be pulled across and displayed
